@@ -97,8 +97,9 @@ def mlp_training(epoch=10):
     # inference_t = run_infer_type(inference_t)
     # inference = run_infer_type(inference)
     func = run_infer_type(func)
-    back = run_infer_type(gradient(func))
-    seq1 = tvm.transform.Sequential([PartialEvaluate(), DeadCodeElimination()])
+    back = run_infer_type(gradient(func, mode="higher_order"))
+    # seq1 = tvm.transform.Sequential([PartialEvaluate(), DeadCodeElimination()])
+    # seq1 = tvm.transform.Sequential([DeadCodeElimination()])
     # back = run_infer_type(seq1(back))
     # ex = create_executor(target="cuda")
 
@@ -109,7 +110,7 @@ def mlp_training(epoch=10):
     
     opt_level = 0
     # target = tvm.target.cuda()
-    with tvm.transform.PassContext(opt_level=opt_level):
+    with tvm.transform.PassContext(opt_level=opt_level, disabled_pass=['PartialEvaluate']):
         lib = relay.build(mod, target='llvm', params=params)
 
 
