@@ -6,6 +6,7 @@ from tvm.relay import create_executor
 import numpy as np
 import tvm
 from trainable_model import Trainable_model
+import time
 
 
 def test_mlp():
@@ -126,7 +127,9 @@ def test_mnist_cnn():
     loss = 0
     cnt = 0
     epoch = 3
+    sum_time = 0
     for i in range(0, epoch):
+        start = time.time()
         for batch_idx, (data, target) in enumerate(train_loader):
             cnt += 1
                 
@@ -141,27 +144,14 @@ def test_mnist_cnn():
 
             if cnt % 100 == 0:
                 print(cnt, ": ", loss / cnt)
-
+        end = time.time()
+        sum_time += end - start
+        print("one epoch time:", end-start)
         print("epoch %d: %f" % (i, loss / cnt))
         loss = 0
         cnt = 0
-    
-    for batch_idx, (data, target) in enumerate(test_loader):
-        cnt += 1
-            
-        data = data.view(-1, 28*28)
-        data = np.array(data)
-        label = np.array(np.eye(10, dtype="float32")[target])
-
-        loss += model.run(data, label, back=False)
-
-        if cnt % 100 == 0:
-            print(cnt, ": ", loss / cnt)
-
-        print("test loss : %f" % (loss / cnt))
-        loss = 0
-        cnt = 0
-
+        
+    print('average epoch time:',sum_time / epoch)
 
 def test_mnist():
     model = Trainable_model(lr=0.01)
@@ -220,7 +210,9 @@ def test_mnist():
     loss = 0
     cnt = 0
     epoch = 3
+    sum_time = 0
     for i in range(0, epoch):
+        start = time.time()
         for batch_idx, (data, target) in enumerate(train_loader):
             cnt += 1
                 
@@ -234,24 +226,30 @@ def test_mnist():
                 print(cnt, ": ", loss / cnt)
 
         print("epoch %d: %f" % (i, loss / cnt))
+        end = time.time()
+        sum_time += end - start
+        print("one epoch time:", end-start)
         loss = 0
         cnt = 0
     
-    for batch_idx, (data, target) in enumerate(test_loader):
-        cnt += 1
+    print('average epoch time:',sum_time / epoch)
+
+    # exit()
+    # for batch_idx, (data, target) in enumerate(test_loader):
+    #     cnt += 1
             
-        data = data.view(-1, 28*28)
-        data = np.array(data)
-        label = np.array(np.eye(10, dtype="float32")[target])
+    #     data = data.view(-1, 28*28)
+    #     data = np.array(data)
+    #     label = np.array(np.eye(10, dtype="float32")[target])
 
-        loss += model.run(data, label, back=False)
+    #     loss += model.run(data, label, back=False)
 
-        if cnt % 100 == 0:
-            print(cnt, ": ", loss / cnt)
+    #     if cnt % 100 == 0:
+    #         print(cnt, ": ", loss / cnt)
 
-        print("test loss : %f" % (loss / cnt))
-        loss = 0
-        cnt = 0
+    #     print("test loss : %f" % (loss / cnt))
+    #     loss = 0
+    #     cnt = 0
 
 if __name__ == "__main__":
     # test_mlp()
